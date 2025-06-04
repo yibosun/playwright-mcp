@@ -36,6 +36,15 @@ function checkCors(config: FullConfig, req: http.IncomingMessage, res: http.Serv
   if (config.server?.corsAllowedOrigins === undefined)
     return false;
 
+  // Check if wildcard is configured - allows all origins for local testing
+  if (config.server.corsAllowedOrigins.some(o => o === '*')) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Max-Age', 2592000);
+    res.setHeader('Access-Control-Allow-Headers', 'mcp-session-id, content-type');
+    return true;
+  }
+
   const origin = req.headers.origin;
   if (origin === undefined)
     return false;
